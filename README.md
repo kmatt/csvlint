@@ -9,12 +9,14 @@ For information about the library, see [godoc](http://godoc.org/github.com/Cleve
 
 ## Installing
 
-Standalone executables for multiple platforms are available via [Github Releases](https://github.com/Clever/csvlint/releases).
-
 You can also compile from source:
 
 ```shell
-go get github.com/Clever/csvlint/cmd/csvlint
+go build ./cmd/csvlint/
+
+# on Windows:
+
+go build .\cmd\csvlint\
 ```
 
 ## Usage
@@ -63,7 +65,3 @@ file is valid
   * 0 - the file is valid
   * 1 - couldn't parse the entire file
   * 2 - could parse the file, but there were lint failures
-
-## Vendoring
-
-Please view the [dev-handbook for instructions](https://github.com/Clever/dev-handbook/blob/master/golang/godep.md).
