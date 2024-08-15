@@ -1,4 +1,4 @@
-module github.com/Clever/csvlint
+module github.com/kmatt/csvlint
 
 go 1.13
 

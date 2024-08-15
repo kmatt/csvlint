@@ -16,13 +16,14 @@ type CSVError struct {
 }
 
 // Error implements the error interface
+// TODO: Option to emit malformed records
 func (e CSVError) Error() string {
-	return fmt.Sprintf("Record #%d has error: %s", e.Num, e.err.Error())
+	return fmt.Sprintf("Record #%d: %s", e.Num, e.err.Error())
 }
 
 // Validate tests whether or not a CSV lints according to RFC 4180.
 // The lazyquotes option will attempt to parse lines that aren't quoted properly.
-func Validate(reader io.Reader, delimiter rune, lazyquotes bool) ([]CSVError, bool, error) {
+func Validate(reader io.Reader, delimiter rune, lazyquotes bool) ([]CSVError, bool, int, error) {
 	r := csv.NewReader(reader)
 	r.TrailingComma = true
 	r.FieldsPerRecord = -1
@@ -41,16 +42,19 @@ func Validate(reader io.Reader, delimiter rune, lazyquotes bool) ([]CSVError, bo
 			if err == io.EOF {
 				break
 			}
+
 			parsedErr, ok := err.(*csv.ParseError)
 			if !ok {
-				return errors, true, err
+				return errors, true, records, err
 			}
+
 			errors = append(errors, CSVError{
 				Record: nil,
 				Num:    records,
 				err:    parsedErr.Err,
 			})
-			return errors, true, nil
+
+			return errors, true, records, nil
 		}
 		if header == nil {
 			header = record
@@ -63,5 +67,6 @@ func Validate(reader io.Reader, delimiter rune, lazyquotes bool) ([]CSVError, bo
 			})
 		}
 	}
-	return errors, false, nil
+
+	return errors, false, records, nil
 }
