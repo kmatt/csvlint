@@ -29,11 +29,13 @@ go build .\cmd\csvlint\
 
 _*NOTE*: The default settings validate that a CSV conforms to [RFC 4180](https://tools.ietf.org/html/rfc4180). By changing the settings, you can no longer strictly guarantee a CSV conforms to RFC 4180._
 
-  * delimiter: the field delimiter, can be any single unicode character
+  * delimiter: The field delimiter, can be any single unicode character
     * default: "," (comma)
     * valid options: "\t", "|", "ஃ", etc
     * if you want multi-character delimiters, you're probably doing CSVs wrong
-  * lazyquotes: allow a quote to appear in an unquoted field and a non-doubled quote to appear in a quoted field. _WARNING: your file may pass linting, but not parse in the way you would expect_
+  * lazyquotes: Allow a quote to appear in an unquoted field and a non-doubled quote to appear in a quoted field
+    * _WARNING: your file may pass linting, but not parse in the way you would expect_
+  * comment: A leading character that identifies a comment line not to be parsed as a CSV record
 
 ### Examples
 
