@@ -23,12 +23,14 @@ func (e CSVError) Error() string {
 
 // Validate tests whether or not a CSV lints according to RFC 4180.
 // The lazyquotes option will attempt to parse lines that aren't quoted properly.
-func Validate(reader io.Reader, delimiter rune, lazyquotes bool) ([]CSVError, bool, int, error) {
+func Validate(reader io.Reader, delimiter rune, comment rune, lazyquotes bool) ([]CSVError, bool, int, error) {
 	r := csv.NewReader(reader)
-	r.TrailingComma = true
 	r.FieldsPerRecord = -1
 	r.LazyQuotes = lazyquotes
 	r.Comma = delimiter
+	r.Comment = comment
+
+	r.ReuseRecord = true // Reuse the same slice for each record for performance
 
 	var header []string
 	errors := []CSVError{}

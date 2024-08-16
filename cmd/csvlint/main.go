@@ -16,8 +16,9 @@ func printHelpAndExit(code int) {
 }
 
 func main() {
-	delimiter := flag.String("delimiter", ",", "Field delimiter in the file, for instance '\\t' or '|'")
-	lazyquotes := flag.Bool("lazyquotes", false, "Try to parse improperly escaped quotes")
+	delimiter := flag.String("delimiter", ",", "Field delimiter in the file, ex: '\\t' or '|'")
+	comment := flag.String("comment", "0", "If not 0, lines beginning with the comment character without preceding whitespace are ignored")
+	lazyquotes := flag.Bool("lazyquotes", false, "A quote may appear in an unquoted field and a non-doubled quote may appear in a quoted field")
 	help := flag.Bool("help", false, "Print help and exit")
 	flag.Parse()
 
@@ -34,8 +35,14 @@ func main() {
 		fmt.Printf("Error unquoting delimiter '%s', note that only one-character delimiters are supported\n\n", *delimiter)
 		printHelpAndExit(1)
 	}
-	// don't need to check size since Unquote returns one-character string
-	comma, _ := utf8.DecodeRuneInString(convertedDelimiter)
+	comma, _ := utf8.DecodeRuneInString(convertedDelimiter) // don't need to check size since Unquote returns one-character string
+
+	commentChar, err := strconv.Unquote(`'` + *comment + `'`)
+	if err != nil {
+		fmt.Printf("Error unquoting comment rune '%s', note that only one-character is supported\n\n", *comment)
+		printHelpAndExit(1)
+	}
+	commentRune, _ := utf8.DecodeRuneInString(commentChar)
 
 	if len(flag.Args()) != 1 {
 		fmt.Print("csvlint accepts a single filepath as an argument\n\n")
@@ -53,7 +60,7 @@ func main() {
 	}
 	defer f.Close()
 
-	invalids, halted, rc, err := csvlint.Validate(f, comma, *lazyquotes)
+	invalids, halted, rc, err := csvlint.Validate(f, comma, commentRune, *lazyquotes)
 	if err != nil {
 		panic(err)
 	}

@@ -13,6 +13,7 @@ var validationTable = []struct {
 	err      error
 	invalids []CSVError
 	comma    rune
+	comment  rune
 	halted   bool
 }{
 	{file: "./test_data/perfect.csv", err: nil, invalids: []CSVError{}},
@@ -20,11 +21,15 @@ var validationTable = []struct {
 	{file: "./test_data/perfect_pipe.csv", err: nil, comma: '|', invalids: []CSVError{}},
 	{file: "./test_data/perfect_colon.csv", err: nil, comma: ':', invalids: []CSVError{}},
 	{file: "./test_data/perfect_semicolon.csv", err: nil, comma: ';', invalids: []CSVError{}},
+
+	{file: "./test_data/comments.csv", err: nil, comment: '#', invalids: []CSVError{}},
+
 	{file: "./test_data/one_long_column.csv", err: nil, invalids: []CSVError{{
 		Record: []string{"d", "e", "f", "g"},
 		err:    csv.ErrFieldCount,
 		Num:    2,
 	}}},
+
 	{file: "./test_data/mult_long_columns.csv", err: nil, invalids: []CSVError{
 		{
 			Record: []string{"d", "e", "f", "g"},
@@ -36,6 +41,7 @@ var validationTable = []struct {
 			Num:    4,
 		}},
 	},
+
 	{file: "./test_data/mult_long_columns_tabs.csv", err: nil, comma: '\t', invalids: []CSVError{
 		{
 			Record: []string{"d", "e", "f", "g"},
@@ -54,11 +60,18 @@ func TestTable(t *testing.T) {
 		f, err := os.Open(test.file)
 		assert.Nil(t, err)
 		defer f.Close()
+
 		comma := test.comma
 		if test.comma == 0 {
 			comma = ','
 		}
-		invalids, halted, _, err := Validate(f, comma, false)
+
+		comment := test.comment
+		if test.comment == 0 {
+			comment = '#'
+		}
+
+		invalids, halted, _, err := Validate(f, comma, comment, false)
 		assert.Equal(t, test.err, err)
 		assert.Equal(t, halted, test.halted)
 		assert.Equal(t, test.invalids, invalids)
