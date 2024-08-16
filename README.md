@@ -11,6 +11,8 @@ For information about the library, see [godoc](http://godoc.org/github.com/Cleve
 
 You can also compile from source:
 
+_The upstream project has CI builds enabled. This is a local build only fork._
+
 ```shell
 go build ./cmd/csvlint/
 
