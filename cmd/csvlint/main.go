@@ -34,13 +34,11 @@ func main() {
 	}
 
 	if flag.NFlag() > 0 {
-		//fmt.Fprintln(os.Stderr, "Warning: not using defaults, may not validate CSV to RFC 4180")
 		log.Warn("Not using defaults, may not validate CSV to RFC 4180")
 	}
 
 	convertedDelimiter, err := strconv.Unquote(`'` + *delimiter + `'`)
 	if err != nil {
-		//fmt.Printf("Error unquoting delimiter '%s', note that only one-character delimiters are supported\n\n", *delimiter)
 		log.Errorf("Error unquoting delimiter '%s', note that only one-character delimiters are supported\n\n", *delimiter)
 		printHelpAndExit(1)
 	}
@@ -48,14 +46,12 @@ func main() {
 
 	commentChar, err := strconv.Unquote(`'` + *comment + `'`)
 	if err != nil {
-		//fmt.Printf("Error unquoting comment rune '%s', note that only one-character is supported\n\n", *comment)
 		log.Errorf("Error unquoting comment rune '%s', note that only one-character is supported\n\n", *comment)
 		printHelpAndExit(1)
 	}
 	commentRune, _ := utf8.DecodeRuneInString(commentChar)
 
 	if len(flag.Args()) != 1 {
-		//fmt.Print("csvlint accepts a single filepath as an argument\n\n")
 		log.Error("csvlint accepts a single filepath as an argument\n\n")
 		printHelpAndExit(1)
 	}
@@ -63,9 +59,7 @@ func main() {
 	f, err := os.Open(flag.Args()[0])
 	if err != nil {
 		if os.IsNotExist(err) {
-			//fmt.Printf("File '%s' does not exist\n", flag.Args()[0])
-			log.Errorf("File '%s' does not exist\n", flag.Args()[0])
-			os.Exit(1)
+			log.Fatal("File '%s' does not exist\n", flag.Args()[0])
 		} else {
 			panic(err)
 		}
@@ -79,7 +73,6 @@ func main() {
 	}
 
 	if len(invalids) == 0 {
-		//fmt.Printf("File is valid - %d records", rc)
 		log.Infof("File is valid - %d records", rc)
 		os.Exit(0)
 	}
@@ -89,13 +82,10 @@ func main() {
 	}
 
 	if len(invalids) > 0 {
-		//fmt.Printf("\n%d errors", len(invalids))
 		log.Warnf("%d malformed records", len(invalids))
 	}
 
 	if halted {
-		//fmt.Println(" - Halted")
-		//os.Exit(1)
 		log.Fatal("Halted")
 	}
 	os.Exit(2)
