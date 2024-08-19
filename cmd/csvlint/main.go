@@ -18,8 +18,10 @@ func printHelpAndExit(code int) {
 }
 
 func main() {
+	//TODO Support wildcards in file argument
+
 	delimiter := flag.String("delimiter", ",", "Field delimiter in the file, ex: '\\t' or '|'")
-	comment := flag.String("comment", "0", "If not 0, lines beginning with the comment character without preceding whitespace are ignored")
+	comment := flag.String("comment", "", "Lines beginning with the comment character without preceding whitespace are ignored")
 	lazyquotes := flag.Bool("lazyquotes", false, "A quote may appear in an unquoted field and a non-doubled quote may appear in a quoted field")
 	debug := flag.Bool("debug", false, "Print debug information")
 	help := flag.Bool("help", false, "Print help and exit")
@@ -45,6 +47,10 @@ func main() {
 	comma, _ := utf8.DecodeRuneInString(convertedDelimiter) // don't need to check size since Unquote returns one-character string
 
 	commentChar, err := strconv.Unquote(`'` + *comment + `'`)
+	if commentChar == "" {
+		// https://pkg.go.dev/encoding/csv#Reader
+		commentChar = "0"
+	}
 	if err != nil {
 		log.Errorf("Error unquoting comment rune '%s', note that only one-character is supported\n\n", *comment)
 		printHelpAndExit(1)
